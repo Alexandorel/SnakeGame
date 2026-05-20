@@ -145,30 +145,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 food.x = randomFoodX;
                 food.y = randomFoodY;
 
-                //Adaugam un segment la sarpe
-                Point lastSegment = snake.corp.get(snake.corp.size() - 1);
-                int newX = lastSegment.x;
-                int newY = lastSegment.y;
-
-                switch (direction) {
-                    case UP -> newY += TILE_SIZE;
-                    case DOWN -> newY -= TILE_SIZE;
-                    case LEFT -> newX += TILE_SIZE;
-                    case RIGHT -> newX -= TILE_SIZE;
-                }
-                snake.adaugaSegment(newX, newY);
+                growSnake();
 
                 score += POINTS_PER_FOOD;
                 scoreLabel.setText("Score: " + score);
             }
 
-            //Verificare coliziune cu peretele
-            for (int i = 0; i < snake.corp.size(); i++) {
-                if (snake.corp.get(i).x < 0) snake.corp.get(i).x = MAX_TILE_POS;
-                if (snake.corp.get(i).x > MAX_TILE_POS) snake.corp.get(i).x = 0;
-                if (snake.corp.get(i).y < 0) snake.corp.get(i).y = MAX_TILE_POS;
-                if (snake.corp.get(i).y > MAX_TILE_POS) snake.corp.get(i).y = 0;
-            }
+            wrapAroundWalls();
 
             //Verificare coliziune cu coada
             if (snakeHitItself()) {
@@ -176,6 +159,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
         repaint();
+    }
+
+    private void wrapAroundWalls() {
+        for (int i = 0; i < snake.corp.size(); i++) {
+            if (snake.corp.get(i).x < 0) snake.corp.get(i).x = MAX_TILE_POS;
+            if (snake.corp.get(i).x > MAX_TILE_POS) snake.corp.get(i).x = 0;
+            if (snake.corp.get(i).y < 0) snake.corp.get(i).y = MAX_TILE_POS;
+            if (snake.corp.get(i).y > MAX_TILE_POS) snake.corp.get(i).y = 0;
+        }
     }
 
     private boolean snakeHitItself() {
