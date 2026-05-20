@@ -48,8 +48,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         add(scoreLabel);
 
-        snake = new Snake();
-        snake.adaugaSegment(TILE_SIZE, TILE_SIZE);
+        snake = new Snake(TILE_SIZE, TILE_SIZE);
 
         food = new Food(0, 0);
         spawnFood();
