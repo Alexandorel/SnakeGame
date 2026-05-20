@@ -161,6 +161,20 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 
+    private void growSnake() {
+        Point lastSegment = snake.corp.get(snake.corp.size() - 1);
+        int newX = lastSegment.x;
+        int newY = lastSegment.y;
+
+        switch (direction) {
+            case UP -> newY += TILE_SIZE;
+            case DOWN -> newY -= TILE_SIZE;
+            case LEFT -> newX += TILE_SIZE;
+            case RIGHT -> newX -= TILE_SIZE;
+        }
+        snake.adaugaSegment(newX, newY);
+    }
+
     private void wrapAroundWalls() {
         for (int i = 0; i < snake.corp.size(); i++) {
             if (snake.corp.get(i).x < 0) snake.corp.get(i).x = MAX_TILE_POS;
