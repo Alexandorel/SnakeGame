@@ -134,17 +134,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             //Verificam coliziunea cu mancarea
             if (snake.corp.get(0).x == food.x && snake.corp.get(0).y == food.y) {
-                int randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-                int randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-                for (int i = 1; i < snake.corp.size(); i++) {
-                    if (snake.corp.get(i).x == randomFoodX && snake.corp.get(i).y == randomFoodY) {
-                        randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-                        randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-                    }
-                }
-                food.x = randomFoodX;
-                food.y = randomFoodY;
-
+                spawnFood();
                 growSnake();
 
                 score += POINTS_PER_FOOD;
@@ -159,6 +149,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
         repaint();
+    }
+
+    private void spawnFood() {
+        int newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+        int newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+        for (int i = 1; i < snake.corp.size(); i++) {
+            if (snake.corp.get(i).x == newX && snake.corp.get(i).y == newY) {
+                newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+                newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+            }
+        }
+        food.x = newX;
+        food.y = newY;
     }
 
     private void growSnake() {
