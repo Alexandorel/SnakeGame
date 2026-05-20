@@ -13,7 +13,20 @@ import java.awt.event.KeyListener;
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
-    private final int step = 40;
+    // board dimensions
+    private static final int TILE_SIZE = 40;
+    private static final int BOARD_TILES = 15;
+    private static final int BOARD_PX = TILE_SIZE * BOARD_TILES;       // 600
+    private static final int MAX_TILE_POS = BOARD_PX - TILE_SIZE;      // 560
+
+    // board + score bar height
+    private static final int SCORE_BAR_HEIGHT = 50;
+    private static final int PANEL_HEIGHT = BOARD_PX + SCORE_BAR_HEIGHT;  // 650
+
+    // Gameplay
+    private static final int TICK_MS = 300;
+    private static final int POINTS_PER_FOOD = 10;
+
     private final Timer gameLoop;
 
     private final Snake snake;
@@ -30,19 +43,19 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         setFocusable(true);
 
         scoreLabel = new JLabel("Score: 0");
-        scoreLabel.setBounds(10, 605, 200, 30);
+        scoreLabel.setBounds(10, BOARD_PX + 5, 200, 30);
         scoreLabel.setForeground(Color.WHITE);
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 16));
         add(scoreLabel);
 
         snake = new Snake();
-        snake.adaugaSegment(40, 40);
+        snake.adaugaSegment(TILE_SIZE, TILE_SIZE);
 
-        int randomFoodX = (int) (Math.random() * 15) * 40;
-        int randomFoodY = (int) (Math.random() * 15) * 40;
+        int randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+        int randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
         food = new Food(randomFoodX, randomFoodY);
 
-        gameLoop = new Timer(300, this);
+        gameLoop = new Timer(TICK_MS, this);
         gameLoop.start();
     }
 
@@ -50,15 +63,15 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, 600, 650);
+        g.fillRect(0, 0, BOARD_PX, PANEL_HEIGHT);
 
         //Desenarea patratelor
         g.setColor(Color.GREEN);
-        for (int i = 40; i < 600; i = i + step) {
-            g.drawLine(0, i, 600, i);
-            g.drawLine(i, 0, i, 600);
+        for (int i = TILE_SIZE; i < BOARD_PX; i += TILE_SIZE) {
+            g.drawLine(0, i, BOARD_PX, i);
+            g.drawLine(i, 0, i, BOARD_PX);
         }
-        g.drawLine(0, 600, 600, 600);
+        g.drawLine(0, BOARD_PX, BOARD_PX, BOARD_PX);
 
         //Desenarea sarpelui
         g.setColor(Color.RED);
@@ -106,10 +119,10 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             // Actualizează poziția capului în funcție de direcție
             switch (direction) {
-                case UP -> snake.corp.get(0).y -= step;
-                case DOWN -> snake.corp.get(0).y += step;
-                case LEFT -> snake.corp.get(0).x -= step;
-                case RIGHT -> snake.corp.get(0).x += step;
+                case UP -> snake.corp.get(0).y -= TILE_SIZE;
+                case DOWN -> snake.corp.get(0).y += TILE_SIZE;
+                case LEFT -> snake.corp.get(0).x -= TILE_SIZE;
+                case RIGHT -> snake.corp.get(0).x += TILE_SIZE;
             }
 
             // Actualizează pozițiile segmentelor următoare
@@ -121,12 +134,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
             //Verificam coliziunea cu mancarea
             if (snake.corp.get(0).x == food.x && snake.corp.get(0).y == food.y) {
-                int randomFoodX = (int) (Math.random() * 15) * 40;
-                int randomFoodY = (int) (Math.random() * 15) * 40;
+                int randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+                int randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
                 for (int i = 1; i < snake.corp.size(); i++) {
                     if (snake.corp.get(i).x == randomFoodX && snake.corp.get(i).y == randomFoodY) {
-                        randomFoodX = (int) (Math.random() * 15) * 40;
-                        randomFoodY = (int) (Math.random() * 15) * 40;
+                        randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+                        randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
                     }
                 }
                 food.x = randomFoodX;
@@ -138,23 +151,23 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
                 int newY = lastSegment.y;
 
                 switch (direction) {
-                    case UP -> newY += step;
-                    case DOWN -> newY -= step;
-                    case LEFT -> newX += step;
-                    case RIGHT -> newX -= step;
+                    case UP -> newY += TILE_SIZE;
+                    case DOWN -> newY -= TILE_SIZE;
+                    case LEFT -> newX += TILE_SIZE;
+                    case RIGHT -> newX -= TILE_SIZE;
                 }
                 snake.adaugaSegment(newX, newY);
 
-                score += 10;
+                score += POINTS_PER_FOOD;
                 scoreLabel.setText("Score: " + score);
             }
 
             //Verificare coliziune cu peretele
             for (int i = 0; i < snake.corp.size(); i++) {
-                if (snake.corp.get(i).x < 0) snake.corp.get(i).x = 560;
-                if (snake.corp.get(i).x > 560) snake.corp.get(i).x = 0;
-                if (snake.corp.get(i).y < 0) snake.corp.get(i).y = 560;
-                if (snake.corp.get(i).y > 560) snake.corp.get(i).y = 0;
+                if (snake.corp.get(i).x < 0) snake.corp.get(i).x = MAX_TILE_POS;
+                if (snake.corp.get(i).x > MAX_TILE_POS) snake.corp.get(i).x = 0;
+                if (snake.corp.get(i).y < 0) snake.corp.get(i).y = MAX_TILE_POS;
+                if (snake.corp.get(i).y > MAX_TILE_POS) snake.corp.get(i).y = 0;
             }
 
             //Verificare coliziune cu coada
