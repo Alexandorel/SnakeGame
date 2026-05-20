@@ -86,7 +86,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
-            //In aceste case uri am interzis sarpelui sa se intoarca in directia opusa
             case KeyEvent.VK_UP -> {
                 if (direction != Direction.DOWN) direction = Direction.UP;
             }
@@ -113,37 +112,38 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (gameLoop.isRunning()) {
-            Point previousHead = new Point(snake.corp.get(0));
+        if (!gameLoop.isRunning()) return;
 
-            // Actualizează poziția capului în funcție de direcție
-            switch (direction) {
-                case UP -> snake.corp.get(0).y -= TILE_SIZE;
-                case DOWN -> snake.corp.get(0).y += TILE_SIZE;
-                case LEFT -> snake.corp.get(0).x -= TILE_SIZE;
-                case RIGHT -> snake.corp.get(0).x += TILE_SIZE;
-            }
+        moveSnake();
 
-            // Actualizează pozițiile segmentelor următoare
-            for (int i = 1; i < snake.corp.size(); i++) {
-                Point temp = new Point(snake.corp.get(i));
-                snake.corp.set(i, previousHead);
-                previousHead = temp;
-            }
-
-            //Verificam coliziunea cu mancarea
-            if (snakeAteFood()) {
-                handleFoodEaten();
-            }
-
-            wrapAroundWalls();
-
-            //Verificare coliziune cu coada
-            if (snakeHitItself()) {
-                gameOver();
-            }
+        if (snakeAteFood()) {
+            handleFoodEaten();
         }
+
+        wrapAroundWalls();
+
+        if (snakeHitItself()) {
+            gameOver();
+        }
+
         repaint();
+    }
+
+    private void moveSnake() {
+        Point previousHead = new Point(snake.corp.get(0));
+
+        switch (direction) {
+            case UP -> snake.corp.get(0).y -= TILE_SIZE;
+            case DOWN -> snake.corp.get(0).y += TILE_SIZE;
+            case LEFT -> snake.corp.get(0).x -= TILE_SIZE;
+            case RIGHT -> snake.corp.get(0).x += TILE_SIZE;
+        }
+
+        for (int i = 1; i < snake.corp.size(); i++) {
+            Point temp = new Point(snake.corp.get(i));
+            snake.corp.set(i, previousHead);
+            previousHead = temp;
+        }
     }
 
     private boolean snakeAteFood() {
