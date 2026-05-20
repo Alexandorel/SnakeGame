@@ -73,13 +73,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
         //Desenarea sarpelui
         g.setColor(Color.RED);
-        for (int i = 0; i < snake.corp.size(); i++) {
-            g.fillRect(snake.corp.get(i).x, snake.corp.get(i).y, snake.size, snake.size);
+        for (Point segment : snake.getBody()) {
+            g.fillRect(segment.x, segment.y, TILE_SIZE, TILE_SIZE);
         }
 
         //Desenarea mancarii
         g.setColor(Color.YELLOW);
-        g.fillRect(food.x, food.y, food.size, food.size);
+        g.fillRect(food.getX(), food.getY(), TILE_SIZE, TILE_SIZE);
     }
 
     @Override
@@ -113,46 +113,25 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (!gameLoop.isRunning()) return;
 
-        moveSnake();
+        snake.move(direction, TILE_SIZE);
 
-        if (snakeAteFood()) {
+        Point head = snake.getHead();
+        if (food.isAt(head.x, head.y)) {
             handleFoodEaten();
         }
 
-        wrapAroundWalls();
+        snake.wrapAround(MAX_TILE_POS);
 
-        if (snakeHitItself()) {
+        if (snake.collidesWithSelf()) {
             gameOver();
         }
 
         repaint();
     }
 
-    private void moveSnake() {
-        Point previousHead = new Point(snake.corp.get(0));
-
-        switch (direction) {
-            case UP -> snake.corp.get(0).y -= TILE_SIZE;
-            case DOWN -> snake.corp.get(0).y += TILE_SIZE;
-            case LEFT -> snake.corp.get(0).x -= TILE_SIZE;
-            case RIGHT -> snake.corp.get(0).x += TILE_SIZE;
-        }
-
-        for (int i = 1; i < snake.corp.size(); i++) {
-            Point temp = new Point(snake.corp.get(i));
-            snake.corp.set(i, previousHead);
-            previousHead = temp;
-        }
-    }
-
-    private boolean snakeAteFood() {
-        Point head = snake.corp.get(0);
-        return head.x == food.x && head.y == food.y;
-    }
-
     private void handleFoodEaten() {
         spawnFood();
-        growSnake();
+        snake.grow(direction, TILE_SIZE);
         score += POINTS_PER_FOOD;
         scoreLabel.setText("Score: " + score);
     }
@@ -160,47 +139,13 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private void spawnFood() {
         int newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
         int newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-        for (int i = 1; i < snake.corp.size(); i++) {
-            if (snake.corp.get(i).x == newX && snake.corp.get(i).y == newY) {
+        for (int i = 1; i < snake.size(); i++) {
+            if (snake.bodyContains(newX, newY)) {
                 newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
                 newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
             }
         }
-        food.x = newX;
-        food.y = newY;
-    }
-
-    private void growSnake() {
-        Point lastSegment = snake.corp.get(snake.corp.size() - 1);
-        int newX = lastSegment.x;
-        int newY = lastSegment.y;
-
-        switch (direction) {
-            case UP -> newY += TILE_SIZE;
-            case DOWN -> newY -= TILE_SIZE;
-            case LEFT -> newX += TILE_SIZE;
-            case RIGHT -> newX -= TILE_SIZE;
-        }
-        snake.adaugaSegment(newX, newY);
-    }
-
-    private void wrapAroundWalls() {
-        for (int i = 0; i < snake.corp.size(); i++) {
-            if (snake.corp.get(i).x < 0) snake.corp.get(i).x = MAX_TILE_POS;
-            if (snake.corp.get(i).x > MAX_TILE_POS) snake.corp.get(i).x = 0;
-            if (snake.corp.get(i).y < 0) snake.corp.get(i).y = MAX_TILE_POS;
-            if (snake.corp.get(i).y > MAX_TILE_POS) snake.corp.get(i).y = 0;
-        }
-    }
-
-    private boolean snakeHitItself() {
-        Point head = snake.corp.get(0);
-        for (int i = 1; i < snake.corp.size(); i++) {
-            if (head.x == snake.corp.get(i).x && head.y == snake.corp.get(i).y) {
-                return true;
-            }
-        }
-        return false;
+        food.moveTo(newX, newY);
     }
 
     private void gameOver() {
