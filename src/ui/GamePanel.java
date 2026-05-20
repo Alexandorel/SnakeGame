@@ -171,13 +171,21 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
 
             //Verificare coliziune cu coada
-            for (int i = 1; i < snake.corp.size(); i++) {
-                if (snake.corp.get(0).x == snake.corp.get(i).x && snake.corp.get(0).y == snake.corp.get(i).y) {
-                    gameOver();
-                }
+            if (snakeHitItself()) {
+                gameOver();
             }
         }
         repaint();
+    }
+
+    private boolean snakeHitItself() {
+        Point head = snake.corp.get(0);
+        for (int i = 1; i < snake.corp.size(); i++) {
+            if (head.x == snake.corp.get(i).x && head.y == snake.corp.get(i).y) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void gameOver() {
