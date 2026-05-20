@@ -51,9 +51,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         snake = new Snake();
         snake.adaugaSegment(TILE_SIZE, TILE_SIZE);
 
-        int randomFoodX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-        int randomFoodY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-        food = new Food(randomFoodX, randomFoodY);
+        food = new Food(0, 0);
+        spawnFood();
 
         gameLoop = new Timer(TICK_MS, this);
         gameLoop.start();
@@ -133,12 +132,8 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
 
             //Verificam coliziunea cu mancarea
-            if (snake.corp.get(0).x == food.x && snake.corp.get(0).y == food.y) {
-                spawnFood();
-                growSnake();
-
-                score += POINTS_PER_FOOD;
-                scoreLabel.setText("Score: " + score);
+            if (snakeAteFood()) {
+                handleFoodEaten();
             }
 
             wrapAroundWalls();
@@ -149,6 +144,18 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
             }
         }
         repaint();
+    }
+
+    private boolean snakeAteFood() {
+        Point head = snake.corp.get(0);
+        return head.x == food.x && head.y == food.y;
+    }
+
+    private void handleFoodEaten() {
+        spawnFood();
+        growSnake();
+        score += POINTS_PER_FOOD;
+        scoreLabel.setText("Score: " + score);
     }
 
     private void spawnFood() {
