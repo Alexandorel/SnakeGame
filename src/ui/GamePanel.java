@@ -1,5 +1,6 @@
 package ui;
 
+import model.Difficulty;
 import model.Food;
 import model.Snake;
 import movement.Direction;
@@ -10,24 +11,25 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.function.IntConsumer;
 
 public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     // board dimensions
     private static final int TILE_SIZE = 40;
     private static final int BOARD_TILES = 15;
-    private static final int BOARD_PX = TILE_SIZE * BOARD_TILES;       // 600
+    public static final int BOARD_PX = TILE_SIZE * BOARD_TILES;       // 600
     private static final int MAX_TILE_POS = BOARD_PX - TILE_SIZE;      // 560
 
     // board + score bar height
     private static final int SCORE_BAR_HEIGHT = 50;
-    private static final int PANEL_HEIGHT = BOARD_PX + SCORE_BAR_HEIGHT;  // 650
+    public static final int PANEL_HEIGHT = BOARD_PX + SCORE_BAR_HEIGHT;  // 650
 
     // Gameplay
-    private static final int TICK_MS = 300;
     private static final int POINTS_PER_FOOD = 10;
 
     private final Timer gameLoop;
+    private final IntConsumer onGameOver;
 
     private final Snake snake;
     private final Food food;
@@ -37,7 +39,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private Direction direction = Direction.DOWN;
 
-    public GamePanel() {
+    public GamePanel(Difficulty difficulty, IntConsumer onGameOver) {
+        this.onGameOver = onGameOver;
+
         setLayout(null);
         setPreferredSize(new Dimension(BOARD_PX, PANEL_HEIGHT));
         addKeyListener(this);
@@ -54,7 +58,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         food = new Food(0, 0);
         spawnFood();
 
-        gameLoop = new Timer(TICK_MS, this);
+        gameLoop = new Timer(difficulty.getTickMs(), this);
         gameLoop.start();
     }
 
