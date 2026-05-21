@@ -153,7 +153,6 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     private void gameOver() {
         gameLoop.stop();
-        JOptionPane.showMessageDialog(this, "Game Over! Your score: " + score);
-        System.exit(0);
+        onGameOver.accept(score);
     }
 }
