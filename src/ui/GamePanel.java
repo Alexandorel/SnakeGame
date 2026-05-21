@@ -119,13 +119,12 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
         if (!gameLoop.isRunning()) return;
 
         snake.move(direction, TILE_SIZE);
+        snake.wrapAround(MAX_TILE_POS);
 
         Point head = snake.getHead();
         if (food.isAt(head.x, head.y)) {
             handleFoodEaten();
         }
-
-        snake.wrapAround(MAX_TILE_POS);
 
         if (snake.collidesWithSelf()) {
             gameOver();
