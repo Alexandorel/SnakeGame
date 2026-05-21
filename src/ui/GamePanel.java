@@ -39,6 +39,7 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
 
     public GamePanel() {
         setLayout(null);
+        setPreferredSize(new Dimension(BOARD_PX, PANEL_HEIGHT));
         addKeyListener(this);
         setFocusable(true);
 
@@ -139,11 +140,9 @@ public class GamePanel extends JPanel implements KeyListener, ActionListener {
     private void spawnFood() {
         int newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
         int newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-        for (int i = 1; i < snake.size(); i++) {
-            if (snake.bodyContains(newX, newY)) {
-                newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-                newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
-            }
+        if (snake.bodyContains(newX, newY)) {
+            newX = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
+            newY = (int) (Math.random() * BOARD_TILES) * TILE_SIZE;
         }
         food.moveTo(newX, newY);
     }
